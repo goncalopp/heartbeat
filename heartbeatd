@@ -2,9 +2,12 @@
 #heartbeat daemon (provides heartbeat)
 #ugly hack since "nc -k" doesn't seem to work on all systems...
 
+PORT=23576
+COMMAND="nc -k -l $PORT &"
+
 trap "kill 0" SIGINT SIGTERM EXIT
 #trap 'kill $(jobs -p)' SIGINT SIGTERM EXIT
-nc -k -l 23576 &
+$COMMAND
 while true 
 	do
 	sleep 1
