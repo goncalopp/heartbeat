@@ -1,4 +1,5 @@
 #!/bin/bash
+#utility to monitor a host for it's heartbeat (not a daemon)
 
 HOST=$1
 SLEEP_TIME=1
