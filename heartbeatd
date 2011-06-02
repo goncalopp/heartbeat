@@ -1,0 +1,8 @@
+#!/bin/bash
+trap "kill 0" SIGINT SIGTERM EXIT
+#trap 'kill $(jobs -p)' SIGINT SIGTERM EXIT
+nc -k -l 23576 &
+while true 
+	do
+	sleep 1
+	done

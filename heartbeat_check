@@ -1,0 +1,14 @@
+#!/bin/bash
+#checks for a heartbeat (in this case a simple open socket)
+HOST=$1
+NUMBER_OF_TRIES=$2
+if [[ $NUMBER_OF_TRIES == "" ]]; then NUMBER_OF_TRIES=1; fi
+
+SUCESS=12302
+while [ $SUCESS -ne 0 ] && [[ $NUMBER_OF_TRIES>0 ]] 
+	do
+	nc -w 1 -z $HOST 23576
+	SUCESS=$?
+	NUMBER_OF_TRIES=$(( $NUMBER_OF_TRIES -1 ))
+	done
+exit $SUCESS

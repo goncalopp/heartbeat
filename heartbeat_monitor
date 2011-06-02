@@ -1,0 +1,26 @@
+#!/bin/bash
+
+HOST=$1
+SLEEP_TIME=1
+TRIES=5
+
+echo `date --utc "+%s"`  `date --utc "+%Y-%m-%dT%H:%M:%SZ"` script started, host is $HOST
+
+
+LAST_STATE=12345
+while [[ 0 == 0 ]]
+	do
+	heartbeat_check $HOST $TRIES
+	NEW_STATE=$?
+	if [[ $LAST_STATE != $NEW_STATE ]]
+		then
+		LAST_STATE=$NEW_STATE
+		if [[ $NEW_STATE == 0 ]]
+			then
+			echo `date --utc "+%s"` `date --utc "+%Y-%m-%dT%H:%M:%SZ"` $NEW_STATE u #host is up
+		else
+			echo `date --utc "+%s"` `date --utc "+%Y-%m-%dT%H:%M:%SZ"` $NEW_STATE d # host is down
+		fi
+	fi
+	sleep $SLEEP_TIME
+done
