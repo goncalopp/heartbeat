@@ -2,8 +2,12 @@
 #utility to monitor a host for it's heartbeat (not a daemon)
 
 HOST=$1
+if [[ $HOST == "" ]]; then echo "usage:  heartbeat_monitor HOST"; exit 0; fi
 SLEEP_TIME=1
 TRIES=5
+
+
+
 
 echo `date --utc "+%s"`  `date --utc "+%Y-%m-%dT%H:%M:%SZ"` script started, host is $HOST
 

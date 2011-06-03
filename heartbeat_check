@@ -13,7 +13,7 @@ if [[ $NUMBER_OF_TRIES == "" ]]; then NUMBER_OF_TRIES=1; fi
 SUCESS=12302
 while [ $SUCESS -ne 0 ] && [[ $NUMBER_OF_TRIES>0 ]] 
 	do
-	$COMMAND
+	$COMMAND > /dev/null 2>&1
 	SUCESS=$?
 	NUMBER_OF_TRIES=$(( $NUMBER_OF_TRIES -1 ))
 	done
