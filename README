@@ -1,0 +1,3 @@
+this is a set of shell scripts for monitoring hosts conectivity over a
+network (and thus, uptime, if the network is reliable)
+it depends on OpenBSD's netcat (gnu netcat will not work)
