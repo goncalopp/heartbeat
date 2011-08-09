@@ -5,7 +5,7 @@ import signal
 import time
 
 parser = argparse.ArgumentParser(description="Monitors one or more hosts for heartbeat until SIGINT is received")
-parser.add_argument('hosts', action="append", type=str)
+parser.add_argument('hosts', action="store", nargs="+", type=str)
 parser.add_argument('-p', action="store", type=int, help="port", dest="port", default=HEARTBEAT_PORT)
 parser.add_argument('-t', action="store", type=int, help= "timeout", dest="timeout", default=HEARTBEAT_TIMEOUT)
 parser.add_argument('-r', action="store", type=int, help= "repeat", dest="repeat", default=HEARTBEAT_REPEAT)
