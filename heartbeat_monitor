@@ -1,31 +1,26 @@
-#!/bin/bash
-#utility to monitor a host for it's heartbeat (not a daemon)
+#!/usr/bin/python
+from heartbeat_lib import HeartbeatMonitor, HEARTBEAT_PORT, HEARTBEAT_REPEAT, HEARTBEAT_TIMEOUT
+import argparse
+import signal
+import time
 
-HOST=$1
-if [[ $HOST == "" ]]; then echo "usage:  heartbeat_monitor HOST"; exit 0; fi
-SLEEP_TIME=1
-TRIES=5
+parser = argparse.ArgumentParser(description="Monitors one or more hosts for heartbeat until SIGINT is received")
+parser.add_argument('hosts', action="append", type=str)
+parser.add_argument('-p', action="store", type=int, help="port", dest="port", default=HEARTBEAT_PORT)
+parser.add_argument('-t', action="store", type=int, help= "timeout", dest="timeout", default=HEARTBEAT_TIMEOUT)
+parser.add_argument('-r', action="store", type=int, help= "repeat", dest="repeat", default=HEARTBEAT_REPEAT)
+args= parser.parse_args()
+
+p,t,r= args.port, args.timeout, args.repeat
+hosts= args.hosts
+
+monitors= [HeartbeatMonitor(host, p,t,r) for host in hosts]
+map(HeartbeatMonitor.start, monitors)
 
 
-
-
-echo `date --utc "+%s"`  `date --utc "+%Y-%m-%dT%H:%M:%SZ"` script started, host is $HOST
-
-
-LAST_STATE=12345
-while [[ 0 == 0 ]]
-	do
-	heartbeat_check $HOST $TRIES
-	NEW_STATE=$?
-	if [[ $LAST_STATE != $NEW_STATE ]]
-		then
-		LAST_STATE=$NEW_STATE
-		if [[ $NEW_STATE == 0 ]]
-			then
-			echo `date --utc "+%s"` `date --utc "+%Y-%m-%dT%H:%M:%SZ"` $NEW_STATE u #host is up
-		else
-			echo `date --utc "+%s"` `date --utc "+%Y-%m-%dT%H:%M:%SZ"` $NEW_STATE d # host is down
-		fi
-	fi
-	sleep $SLEEP_TIME
-done
+def ctrl_c_handler(signal, frame):
+        map(HeartbeatMonitor.stop, monitors)
+        exit(0)
+        
+signal.signal(signal.SIGINT, ctrl_c_handler)
+signal.pause()  #wait for ctrl-c

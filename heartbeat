@@ -1,0 +1,14 @@
+#!/usr/bin/python
+from heartbeat_lib import HeartbeatDaemon, HEARTBEAT_PORT, HEARTBEAT_REPEAT, HEARTBEAT_TIMEOUT
+import argparse
+import signal
+import time
+
+parser = argparse.ArgumentParser(description=HeartbeatDaemon.__doc__)
+parser.add_argument('-p', action="store", type=int, help="port", dest="port", default=HEARTBEAT_PORT)
+args= parser.parse_args()
+
+d= HeartbeatDaemon(args.port)
+d.start()
+while True:
+    time.sleep(10)
