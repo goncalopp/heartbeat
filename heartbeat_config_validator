@@ -1,0 +1,6 @@
+listen_port = integer(min=1, max=65535, default=23576)
+connect_port = integer(min=1, max=65535, default=23576)
+timeout = float(default=1)
+repeat = integer(min=1, default=5)
+hosts = string_list(min=1, default=list("localhost"))
+logfile = string(default="/var/log/heartbeat_monitor_daemon.log")

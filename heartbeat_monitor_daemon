@@ -3,7 +3,7 @@ import daemon
 import time
 import os, pwd, grp
 
-from heartbeat_lib import HeartbeatMonitor, HEARTBEAT_PORT, HEARTBEAT_REPEAT, HEARTBEAT_TIMEOUT
+from heartbeat_lib import HeartbeatMonitor
 
 def drop_privileges(uid_name='nobody', gid_name='nogroup'):
     if os.getuid() != 0:
@@ -16,17 +16,10 @@ def drop_privileges(uid_name='nobody', gid_name='nogroup'):
     os.umask(077)
 
 
-#HEARTBEAT_PORT=
-#HEARTBEAT_REPEAT=
-#HEARTBEAT_TIMEOUT=
-
-hosts= ["localhost"]
-logfile= "/var/log/heartbeat_monitor_daemon.log"
-
 def main():
-    with  as f:
+    with open(HEARTBEAT_LOGFILE) as f:
         log_function= lambda x: f.write(x+"\n")
-        monitors= [HeartbeatMonitor(host, HEARTBEAT_PORT,HEARTBEAT_TIMEOUT,HEARTBEAT_REPEAT) for host in hosts]
+        monitors= [HeartbeatMonitor(host) for host in HEARTBEAT_HOSTS]
         for monitor in monitors:
             monitor.change_log_function(log_function)
             monitor.start()

@@ -2,13 +2,33 @@
 import datetime
 import time
 import threading
+import sys
+from configobj import ConfigObj
+from validate import Validator
 
-HEARTBEAT_PORT= 23576
-HEARTBEAT_TIMEOUT= 1
-HEARTBEAT_REPEAT= 5
+
+HEARTBEAT_CONFIG_FILE= "/etc/heartbeat.conf"
+
+def read_configuration():
+    heartbeat_config = ConfigObj(HEARTBEAT_CONFIG_FILE, configspec='heartbeat_config_validator')
+    validator= Validator()
+    if not True==heartbeat_config.validate(validator):
+        print "Error validating configuration file"
+        sys.exit(1)
+    globals().update(
+            {
+        'HEARTBEAT_LISTEN_PORT':    heartbeat_config['listen_port'],
+        'HEARTBEAT_CONNECT_PORT':   heartbeat_config['connect_port'],
+        'HEARTBEAT_TIMEOUT':        heartbeat_config['timeout'],
+        'HEARTBEAT_REPEAT':         heartbeat_config['repeat'],
+        'HEARTBEAT_HOSTS':          heartbeat_config['hosts'],
+        'HEARTBEAT_LOGFILE':        heartbeat_config['logfile'],
+            })
+
+read_configuration()
 
 
-def heartbeat_check(host, port= HEARTBEAT_PORT, timeout= HEARTBEAT_TIMEOUT, repeat= HEARTBEAT_REPEAT, sleep=False):
+def heartbeat_check(host, port= HEARTBEAT_CONNECT_PORT, timeout= HEARTBEAT_TIMEOUT, repeat= HEARTBEAT_REPEAT, sleep=False):
     '''Checks for a heartbeat on HOST:PORT.
     Tries to contact REPEAT times, waiting TIMEOUT on each.
     Returns False if all fail, True otherwise.
@@ -36,9 +56,9 @@ def heartbeat_check(host, port= HEARTBEAT_PORT, timeout= HEARTBEAT_TIMEOUT, repe
 
     return state
     
-class HeartbeatDaemon(threading.Thread):
-    '''runs a heartbeat daemon on PORT'''
-    def __init__(self, port=HEARTBEAT_PORT):
+class HeartbeatListener(threading.Thread):
+    '''runs a heartbeat listener on PORT'''
+    def __init__(self, port=HEARTBEAT_LISTEN_PORT):
         threading.Thread.__init__(self)
         self.setDaemon(True)
         self.port= port
@@ -72,7 +92,7 @@ def now_unix():
 
 
 class HeartbeatMonitor(threading.Thread):
-    def __init__(self, host, port=HEARTBEAT_PORT, timeout=HEARTBEAT_TIMEOUT, repeat=HEARTBEAT_REPEAT):
+    def __init__(self, host, port=HEARTBEAT_CONNECT_PORT, timeout=HEARTBEAT_TIMEOUT, repeat=HEARTBEAT_REPEAT):
         threading.Thread.__init__(self)
         self.host, self.port, self.timeout, self.repeat= host, port, timeout, repeat
         self.state= 'different'
@@ -116,3 +136,7 @@ class HeartbeatMonitor(threading.Thread):
         self.stopsignal= True
         self.join()
         self.running=False
+
+
+
+
