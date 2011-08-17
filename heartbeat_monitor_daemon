@@ -1,9 +1,13 @@
 #!/usr/bin/python
 import daemon
 import time
+import lockfile
 import os, pwd, grp
+import argparse
+import sys
 
 from heartbeat_lib import HeartbeatMonitor
+
 
 def drop_privileges(uid_name='nobody', gid_name='nogroup'):
     if os.getuid() != 0:
@@ -16,7 +20,7 @@ def drop_privileges(uid_name='nobody', gid_name='nogroup'):
     os.umask(077)
 
 
-def main():
+def run_function():
     with open(HEARTBEAT_LOGFILE) as f:
         log_function= lambda x: f.write(x+"\n")
         monitors= [HeartbeatMonitor(host) for host in HEARTBEAT_HOSTS]
@@ -26,7 +30,33 @@ def main():
         while True:
             time.sleep(1);
 
+def start():
+    pass
+
+def stop():
+    pass
+
+def restart():
+    pass
+
+def reload():
+    pass
+
+def wrong_argument(x):
+    print "Wrong argument:",x
+    sys.exit(1)
+
+    
+parser = argparse.ArgumentParser(description="starts, stops, or restarts heartbeat_monitor")
+parser.add_argument('action', action="store", type=str)
+
+args= parser.parse_args()
+actions= {'start':start, }
+if args.action=="start":
+    pass
+
+    
 f= open(logfile, "a")
-with daemon.DaemonContext():
+with daemon.DaemonContext(pidfile=lockfile.FileLock('/var/run/heartbeat_md.pid'),):
     main()
 
